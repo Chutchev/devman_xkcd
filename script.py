@@ -4,6 +4,9 @@ import os
 import random
 
 
+VERSION_API = 5.92
+
+
 def wall_post(info, alt, access_token, group_id):
     url = 'https://api.vk.com/method/wall.post'
     owner_id = info['owner_id']
@@ -13,7 +16,7 @@ def wall_post(info, alt, access_token, group_id):
               'message': alt,
               'attachments': f'photo{owner_id}_{media_id}',
               'access_token': access_token,
-              'v': 5.92}
+              'v': VERSION_API}
     requests.post(url, params=params)
 
 
@@ -24,7 +27,7 @@ def save_wall_photo(group_id, server, hash, photo, access_token):
               'photo': photo,
               'group_id': group_id,
               'access_token': access_token,
-              'v': 5.92}
+              'v': VERSION_API}
     response = requests.post(url, params=params)
     info = response.json()
     return info
@@ -34,14 +37,15 @@ def upload_image_on_server(upload_url, group_id, comics):
     with open(f'{comics}.png', 'rb') as f:
         image = f.read()
     files = {'photo': (f'{comics}.png', image)}
-    params = {'group_id': group_id, 'v': 5.92}
+    params = {'group_id': group_id, 'v': VERSION_API}
     response = requests.post(upload_url, files=files, params=params)
-    return response.json()['server'], response.json()['photo'], response.json()['hash']
+    json_content = response.json()
+    return json_content['server'], json_content['photo'], json_content['hash']
 
 
 def get_wall_upload_server(access_token, group_id):
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
-    params = {'access_token': access_token, 'group_id': group_id, 'v': 5.92}
+    params = {'access_token': access_token, 'group_id': group_id, 'v': VERSION_API}
     response = requests.get(url, params=params)
     return response.json()['response']['upload_url']
 
