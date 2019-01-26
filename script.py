@@ -46,31 +46,23 @@ def get_wall_upload_server(access_token, group_id):
     return response.json()['response']['upload_url']
 
 
-def parse_json(json_content):
-    return json_content['img'], json_content['alt']
-
-
 def download_picture(image_url, comics_number):
     response = requests.get(image_url)
     with open(f'{comics_number}.png', 'wb') as f:
         f.write(response.content)
 
 
-def number_of_comics():
-    url = 'http://xkcd.com/info.0.json'
-    response = requests.get(url)
-    return response.json()['num']
-
-
 def main():
     load_dotenv()
     access_token = os.getenv('access_token')
     group_id = os.getenv('group_id')
-    comics_number = number_of_comics()
+    url = 'http://xkcd.com/info.0.json'
+    response = requests.get(url)
+    comics_number = response.json()['num']
     comics = random.randint(0, comics_number)
     url = f'https://xkcd.com/{comics}/info.0.json'
     response = requests.get(url)
-    image_url, alt = parse_json(response.json())
+    image_url, alt = response.json()['img'], response.json()['alt']
     download_picture(image_url, comics)
     upload_url = get_wall_upload_server(access_token, group_id)
     server, photo, hash = upload_image_on_server(upload_url, group_id, comics)
